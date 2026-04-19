@@ -1,0 +1,5 @@
+{
+  "schema_version": "1",
+  "comment": "Revocation blocklist. Any installed plugin matching a blocked entry will be quarantined on app launch and blocked at install time. Add entries when a plugin version has a known security issue. max_version is inclusive; omit to block all versions.",
+  "blocked": []
+}

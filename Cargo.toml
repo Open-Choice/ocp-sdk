@@ -1,0 +1,26 @@
+[workspace]
+members = [
+    "crates/ocp-types-v1",
+    "crates/ocp-conformance",
+    "crates/oc-core",
+    "crates/ocp-host",
+    "crates/oc-sign",
+    "crates/oc-runner",
+    "crates/oc-cli",
+]
+resolver = "2"
+
+[workspace.dependencies]
+chrono      = { version = "0.4", features = ["serde", "clock"] }
+dirs        = "5"
+hex         = "0.4"
+rand        = "0.8"
+tempfile    = "3"
+reqwest     = { version = "0.11", features = ["json", "blocking"] }
+serde       = { version = "1", features = ["derive"] }
+serde_json  = "1"
+sha2        = "0.10"
+thiserror   = "1"
+toml        = { version = "0.8", features = ["preserve_order"] }
+ulid        = "1"
+uuid        = { version = "1", features = ["v4"] }

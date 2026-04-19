@@ -1,0 +1,7 @@
+{
+  "id": "valid_run_relative",
+  "description": "PathRef::RunRelative round-trips",
+  "target": "path_ref",
+  "assertion": "roundtrip",
+  "input": { "kind": "run-relative", "path": "stage_01/result.json" }
+}

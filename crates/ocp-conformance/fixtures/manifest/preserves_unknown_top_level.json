@@ -1,0 +1,29 @@
+{
+  "id": "preserves_unknown_top_level",
+  "description": "Manifest with an unknown top-level field MUST round-trip the unknown field losslessly",
+  "target": "manifest",
+  "assertion": "preserve_unknown",
+  "input": {
+    "schema_version": "1",
+    "plugin_id": "com.example.future-plugin",
+    "display_name": "Future Plugin",
+    "version": "2.0.0",
+    "runtime": {
+      "type": "native-sidecar",
+      "entrypoints": [
+        {
+          "os": "linux",
+          "arch": "x86_64",
+          "path": "bin/linux-x86_64/plugin",
+          "digest": {
+            "algo": "sha-256",
+            "digest": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+          }
+        }
+      ]
+    },
+    "protocol": { "family": "ocp-json", "version": "1" },
+    "future_top_level_field": { "experimental": true, "introduced_in": "1.5.0" }
+  },
+  "expect_preserved": ["future_top_level_field"]
+}

@@ -1,0 +1,11 @@
+{
+  "id": "closure_valid",
+  "description": "Capability set with stdin.control_channel + control.cancel + events.progress satisfies closure",
+  "target": "capability_list",
+  "assertion": "capability_closure_valid",
+  "input": [
+    "stdin.control_channel",
+    "control.cancel",
+    "events.progress"
+  ]
+}

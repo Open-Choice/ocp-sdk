@@ -1,0 +1,29 @@
+[package]
+name = "ocp-host"
+version = "0.1.0"
+edition = "2021"
+description = "Protocol host utilities for Open Choice"
+
+[dependencies]
+chrono = { workspace = true }
+dirs = { workspace = true }
+hex = { workspace = true }
+ocp-types-v1 = { path = "../ocp-types-v1" }
+reqwest = { workspace = true }
+oc-core = { path = "../oc-core" }
+serde = { workspace = true }
+serde_json = { workspace = true }
+sha2 = { workspace = true }
+thiserror = { workspace = true }
+ulid = { workspace = true }
+uuid = { workspace = true }
+
+[dev-dependencies]
+tempfile = { workspace = true }
+
+# Test helper binary: emits a minimal finished RuntimeEvent and exits.
+# Used by tests/runner_tests.rs via env!("CARGO_BIN_EXE_oc-test-helper").
+[[bin]]
+name = "oc-test-helper"
+path = "src/bin/oc_test_helper.rs"
+required-features = []

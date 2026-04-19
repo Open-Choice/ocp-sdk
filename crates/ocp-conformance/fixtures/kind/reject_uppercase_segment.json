@@ -1,0 +1,7 @@
+{
+  "id": "reject_uppercase_segment",
+  "description": "Kind 'event.Run.started' MUST be rejected — uppercase letters are not allowed in segments",
+  "target": "kind",
+  "assertion": "reject",
+  "input": "event.Run.started"
+}

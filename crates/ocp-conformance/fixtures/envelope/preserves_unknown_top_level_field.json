@@ -1,0 +1,19 @@
+{
+  "id": "preserves_unknown_top_level_field",
+  "description": "Envelope with an unknown top-level field MUST round-trip the unknown field losslessly (forward compat)",
+  "target": "envelope",
+  "assertion": "preserve_unknown",
+  "input": {
+    "ocp": "1",
+    "class": "event",
+    "id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF7M" },
+    "ts": "2026-04-07T12:34:56.123456Z",
+    "kind": "event.run.started",
+    "run": {
+      "run_id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF8N" },
+      "tool": { "family": "toy-calculator", "name": "toy-calculator", "version": "1.0.0" }
+    },
+    "future_top_level_field": { "version": 7, "data": [1, 2, 3] }
+  },
+  "expect_preserved": ["future_top_level_field"]
+}

@@ -1,0 +1,26 @@
+{
+  "id": "valid_with_payload_and_ext",
+  "description": "Event envelope with payload and vendor-namespaced ext keys round-trips",
+  "target": "envelope",
+  "assertion": "roundtrip",
+  "input": {
+    "ocp": "1",
+    "class": "event",
+    "id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF7N" },
+    "ts": "2026-04-07T12:35:00.000000Z",
+    "kind": "event.run.progress",
+    "run": {
+      "run_id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF8N" },
+      "tool": { "family": "maxdiff-turf", "name": "maxdiff-turf", "version": "1.2.3" }
+    },
+    "payload": {
+      "iter_completed": 100,
+      "iter_target": 1000,
+      "phase": "sampling"
+    },
+    "ext": {
+      "maxdiff-pipeline.iter_count": 100,
+      "numerious-hb.acceptance_rate": 0.42
+    }
+  }
+}

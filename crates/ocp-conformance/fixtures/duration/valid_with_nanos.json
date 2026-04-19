@@ -1,0 +1,7 @@
+{
+  "id": "valid_with_nanos",
+  "description": "Duration object with seconds + nanos round-trips",
+  "target": "duration",
+  "assertion": "roundtrip",
+  "input": { "seconds": 12345, "nanos": 678900000 }
+}

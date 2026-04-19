@@ -1,0 +1,15 @@
+[package]
+name = "ocp-types-v1"
+version = "0.1.0"
+edition = "2021"
+description = "Open Choice protocol v1 (ocp-json/1) wire types — frozen surface for the v1 protocol freeze"
+license = "MIT OR Apache-2.0"
+rust-version = "1.75"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+serde_json = { workspace = true }

@@ -1,0 +1,7 @@
+{
+  "id": "valid_standard",
+  "description": "Standard capability 'control.cancel' parses",
+  "target": "capability",
+  "assertion": "roundtrip",
+  "input": "control.cancel"
+}

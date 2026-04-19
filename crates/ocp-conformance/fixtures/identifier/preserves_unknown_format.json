@@ -1,0 +1,7 @@
+{
+  "id": "preserves_unknown_format",
+  "description": "Identifier with future fmt 'uuid' MUST be parsed (fmt falls through to Other) — forward compat for new identifier formats",
+  "target": "identifier",
+  "assertion": "roundtrip",
+  "input": { "fmt": "uuid", "value": "550e8400-e29b-41d4-a716-446655440000" }
+}

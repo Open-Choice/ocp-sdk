@@ -1,0 +1,7 @@
+{
+  "id": "reject_unknown_class",
+  "description": "Kind 'status.run.started' MUST be rejected — 'status' is not a valid class",
+  "target": "kind",
+  "assertion": "reject",
+  "input": "status.run.started"
+}

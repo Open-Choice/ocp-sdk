@@ -1,0 +1,7 @@
+{
+  "id": "reject_class_only",
+  "description": "Kind 'event' MUST be rejected — needs at least one segment after class",
+  "target": "kind",
+  "assertion": "reject",
+  "input": "event"
+}

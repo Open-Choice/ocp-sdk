@@ -1,0 +1,10 @@
+{
+  "id": "closure_invalid_both_restart_modes",
+  "description": "restart.exact and restart.approximate are mutually exclusive (capabilities-1.md §5.4)",
+  "target": "capability_list",
+  "assertion": "capability_closure_invalid",
+  "input": [
+    "restart.exact",
+    "restart.approximate"
+  ]
+}

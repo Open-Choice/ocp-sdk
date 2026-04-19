@@ -1,0 +1,15 @@
+[package]
+name = "oc-cli"
+version = "0.1.0"
+edition = "2021"
+description = "Open Choice command-line tool for running .oce files"
+
+[[bin]]
+name = "oc"
+path = "src/main.rs"
+
+[dependencies]
+oc-runner   = { version = "0.1", path = "../oc-runner" }
+clap        = { version = "4", features = ["derive"] }
+dirs        = { workspace = true }
+serde_json  = { workspace = true }

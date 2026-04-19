@@ -1,0 +1,7 @@
+{
+  "id": "valid_omitted_nanos",
+  "description": "Duration object with nanos absent MUST parse (default 0)",
+  "target": "duration",
+  "assertion": "roundtrip",
+  "input": { "seconds": 42 }
+}

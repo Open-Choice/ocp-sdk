@@ -1,0 +1,21 @@
+{
+  "id": "preserves_unknown_payload_field",
+  "description": "Unknown fields nested inside payload are preserved verbatim (envelope payload is opaque Value)",
+  "target": "envelope",
+  "assertion": "roundtrip",
+  "input": {
+    "ocp": "1",
+    "class": "event",
+    "id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF7M" },
+    "ts": "2026-04-07T12:34:56.123456Z",
+    "kind": "event.run.started",
+    "run": {
+      "run_id": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF8N" },
+      "tool": { "family": "toy-calculator", "name": "toy-calculator", "version": "1.0.0" }
+    },
+    "payload": {
+      "seed": "42",
+      "future_payload_field": "preserved"
+    }
+  }
+}

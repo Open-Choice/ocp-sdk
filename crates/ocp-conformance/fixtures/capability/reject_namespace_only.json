@@ -1,0 +1,7 @@
+{
+  "id": "reject_namespace_only",
+  "description": "Capability 'control' MUST be rejected — needs a feature segment after the namespace",
+  "target": "capability",
+  "assertion": "reject",
+  "input": "control"
+}

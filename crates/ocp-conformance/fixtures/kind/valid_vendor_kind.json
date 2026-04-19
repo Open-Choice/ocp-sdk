@@ -1,0 +1,7 @@
+{
+  "id": "valid_vendor_kind",
+  "description": "Vendor-namespaced kind 'event.maxdiff_pipeline.stage_started' parses",
+  "target": "kind",
+  "assertion": "roundtrip",
+  "input": "event.maxdiff_pipeline.stage_started"
+}

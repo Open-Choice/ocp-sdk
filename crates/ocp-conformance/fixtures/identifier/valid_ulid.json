@@ -1,0 +1,7 @@
+{
+  "id": "valid_ulid",
+  "description": "Wrapped ULID identifier round-trips",
+  "target": "identifier",
+  "assertion": "roundtrip",
+  "input": { "fmt": "ulid", "value": "01HQRZ8YV9XW6E2K8N9PJ4QF7M" }
+}

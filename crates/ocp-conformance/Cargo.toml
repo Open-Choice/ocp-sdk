@@ -1,0 +1,16 @@
+[package]
+name = "ocp-conformance"
+version = "0.1.0"
+edition = "2021"
+description = "Conformance test corpus for ocp-json/1 — the operative definition of protocol conformance"
+license = "MIT OR Apache-2.0"
+rust-version = "1.75"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+
+[dev-dependencies]
+ocp-types-v1 = { path = "../ocp-types-v1" }
+serde_json = { workspace = true }

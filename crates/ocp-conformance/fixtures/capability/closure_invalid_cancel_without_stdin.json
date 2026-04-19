@@ -1,0 +1,9 @@
+{
+  "id": "closure_invalid_cancel_without_stdin",
+  "description": "control.cancel without stdin.control_channel MUST fail closure (capabilities-1.md §6)",
+  "target": "capability_list",
+  "assertion": "capability_closure_invalid",
+  "input": [
+    "control.cancel"
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1",
+  "comment": "Ed25519 public keys trusted by this build. Keys with trust_tier='first_party' are Open Choice-controlled. Keys with trust_tier='known_publisher' are verified third-party publishers. The public_key_hex field is a 64-char lowercase hex string encoding 32 bytes. To add a new key, run: cargo run -p oc-sign -- keygen --key-id <id>",
+  "keys": [
+    {
+      "key_id": "open-choice-2026",
+      "trust_tier": "first_party",
+      "public_key_hex": "6942b72e6a7a1ff7bccbff476d9bfeae8b08adc26c7eae8020677c9416740346"
+    },
+    {
+      "key_id": "oc-registry-2026",
+      "trust_tier": "first_party",
+      "public_key_hex": "a37d198ca0cde6fde5eebfe8a54668ef39fcbaebe0cf71337326b688c098a28a"
+    }
+  ]
+}

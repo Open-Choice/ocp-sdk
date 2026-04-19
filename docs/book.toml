@@ -1,0 +1,9 @@
+[book]
+title       = "Open Choice Protocol SDK"
+authors     = ["The Open Choice Authors"]
+language    = "en"
+src         = "src"
+
+[output.html]
+git-repository-url   = "https://github.com/open-choice/ocp-sdk"
+edit-url-template    = "https://github.com/open-choice/ocp-sdk/edit/main/docs/src/{path}"

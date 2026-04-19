@@ -1,0 +1,11 @@
+[package]
+name = "oc-core"
+version = "0.1.0"
+edition = "2021"
+description = "Parser and normalizer for Open Choice .oce and .ocr files"
+
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+toml = { workspace = true }

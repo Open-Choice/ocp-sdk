@@ -1,0 +1,27 @@
+{
+  "id": "valid_minimal",
+  "description": "Minimal valid manifest with one entrypoint and no capabilities",
+  "target": "manifest",
+  "assertion": "roundtrip",
+  "input": {
+    "schema_version": "1",
+    "plugin_id": "com.example.toy-calculator",
+    "display_name": "Toy Calculator",
+    "version": "1.0.0",
+    "runtime": {
+      "type": "native-sidecar",
+      "entrypoints": [
+        {
+          "os": "windows",
+          "arch": "x86_64",
+          "path": "bin/windows-x86_64/toy-calculator.exe",
+          "digest": {
+            "algo": "sha-256",
+            "digest": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          }
+        }
+      ]
+    },
+    "protocol": { "family": "ocp-json", "version": "1" }
+  }
+}

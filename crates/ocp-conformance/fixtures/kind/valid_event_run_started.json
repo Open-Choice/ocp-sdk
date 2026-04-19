@@ -1,0 +1,7 @@
+{
+  "id": "valid_event_run_started",
+  "description": "Standard event kind 'event.run.started' parses",
+  "target": "kind",
+  "assertion": "roundtrip",
+  "input": "event.run.started"
+}

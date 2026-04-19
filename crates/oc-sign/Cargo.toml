@@ -1,0 +1,17 @@
+[package]
+name = "oc-sign"
+version = "0.1.0"
+edition = "2021"
+description = "Key generation and package signing tool for Open Choice plugins."
+
+[[bin]]
+name = "oc-sign"
+path = "src/main.rs"
+
+[dependencies]
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = { workspace = true }
+hex = { workspace = true }
+sha2 = { workspace = true }
+serde_json = { workspace = true }
+zip = "2"
