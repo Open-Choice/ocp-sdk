@@ -9,7 +9,8 @@ name = "oc"
 path = "src/main.rs"
 
 [dependencies]
-oc-runner   = { version = "0.1", path = "../oc-runner" }
-clap        = { version = "4", features = ["derive"] }
-dirs        = { workspace = true }
-serde_json  = { workspace = true }
+oc-runner          = { version = "0.1", path = "../oc-runner" }
+openchoice-license = { version = "0.1", path = "../openchoice-license" }
+clap               = { version = "4", features = ["derive"] }
+dirs               = { workspace = true }
+serde_json         = { workspace = true }

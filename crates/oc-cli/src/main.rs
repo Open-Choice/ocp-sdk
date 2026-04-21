@@ -5,6 +5,7 @@ use std::sync::Arc;
 
 use clap::{Parser, Subcommand, ValueEnum};
 use oc_runner::{get_endpoint_help, list_endpoints, list_plugins, run_oce_file, Db, PluginInstallService};
+use openchoice_license::{self, gate::commit_bypass, try_bypass, Status};
 
 #[derive(Parser)]
 #[command(name = "oc", about = "Open Choice CLI — run .oce files and explore plugins", disable_help_subcommand = true)]
@@ -15,6 +16,13 @@ struct Cli {
     /// Path to the Open Choice database (defaults to the standard install location)
     #[arg(long, global = true)]
     db: Option<PathBuf>,
+
+    /// Apply an emergency bypass code before running the requested command.
+    /// Hidden: this is a support-only escape hatch when the heartbeat is
+    /// unreachable. Use --help to see other flags; this one is intentionally
+    /// omitted from --help output.
+    #[arg(long, hide = true, global = true, value_name = "CODE")]
+    emergency_bypass: Option<String>,
 }
 
 #[derive(Clone, ValueEnum)]
@@ -152,6 +160,12 @@ fn open_plugins_dir(plugins_dir: Option<PathBuf>) -> PathBuf {
 fn main() {
     let cli = Cli::parse();
     let db_override = cli.db;
+
+    if let Some(code) = cli.emergency_bypass.as_deref() {
+        apply_cli_bypass(code);
+    }
+
+    run_license_gate();
 
     match cli.command {
         Command::Run { path, task, output } => {
@@ -348,6 +362,38 @@ fn main() {
                 }
                 Err(e) => { eprintln!("error: {}", e.message); process::exit(1); }
             }
+        }
+    }
+}
+
+// ── License gate ──────────────────────────────────────────────────────────────
+
+fn run_license_gate() {
+    match openchoice_license::check() {
+        Status::Ok => {}
+        Status::OkWarnDay6 => {
+            eprintln!("warning: Open Choice needs to reconnect within 24 hours.");
+        }
+        Status::Blocked(msg) => {
+            eprintln!("error: {}", msg);
+            eprintln!("hint:  if you have an emergency code, rerun with --emergency-bypass <CODE>.");
+            process::exit(1);
+        }
+    }
+}
+
+fn apply_cli_bypass(code: &str) {
+    match try_bypass(code) {
+        Ok(until) => match commit_bypass(until) {
+            Ok(_) => eprintln!("Emergency bypass accepted. Grace extended until {}.", until),
+            Err(e) => {
+                eprintln!("error: could not persist bypass: {}", e);
+                process::exit(1);
+            }
+        },
+        Err(e) => {
+            eprintln!("error: {}", e);
+            process::exit(1);
         }
     }
 }

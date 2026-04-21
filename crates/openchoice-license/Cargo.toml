@@ -1,0 +1,42 @@
+[package]
+name = "openchoice-license"
+version = "0.1.0"
+edition = "2021"
+description = "License gate for the Open Choice desktop app and oc-cli — weekly online heartbeat + pre-shipped emergency bypass codes."
+
+[dependencies]
+# HMAC over state file, HKDF for key derivation, Argon2id for bypass codes.
+hmac        = "0.12"
+sha2        = "0.10"
+hkdf        = "0.12"
+argon2      = "0.5"
+
+# Key storage + random.
+keyring     = "3"
+rand        = "0.8"
+subtle      = "2"
+zeroize     = { version = "1", features = ["derive"] }
+
+# Serialization.
+serde       = { workspace = true }
+serde_json  = { workspace = true }
+base64      = "0.22"
+hex         = { workspace = true }
+chrono      = { workspace = true }
+
+# Filesystem + network.
+dirs        = { workspace = true }
+reqwest     = { version = "0.12", default-features = false, features = ["blocking", "json", "rustls-tls"] }
+
+# Heartbeat signature.
+ed25519-dalek = { version = "2", default-features = false, features = ["std", "zeroize", "rand_core"] }
+
+# Errors.
+thiserror   = { workspace = true }
+anyhow      = "1"
+
+[target.'cfg(windows)'.dependencies]
+winreg      = "0.52"
+
+[dev-dependencies]
+tempfile    = { workspace = true }

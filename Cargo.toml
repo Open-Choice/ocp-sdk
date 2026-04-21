@@ -7,6 +7,7 @@ members = [
     "crates/oc-sign",
     "crates/oc-runner",
     "crates/oc-cli",
+    "crates/openchoice-license",
 ]
 resolver = "2"
 
