@@ -41,16 +41,16 @@ impl Db {
     /// Returns the default database path for the current platform.
     ///
     /// Mirrors where the Open Choice Tauri app stores its database:
-    /// `{data_dir}/com.numerious.openchoice/open_choice.db`
+    /// `{data_dir}/app.openchoice.workbench/open_choice.db`
     pub fn default_path() -> Option<PathBuf> {
-        dirs::data_dir().map(|d: PathBuf| d.join("com.numerious.openchoice").join("open_choice.db"))
+        dirs::data_dir().map(|d: PathBuf| d.join("app.openchoice.workbench").join("open_choice.db"))
     }
 
     /// Returns the default plugins directory for the current platform.
     ///
     /// Mirrors where the Open Choice Tauri app extracts plugin binaries:
-    /// `{data_dir}/com.numerious.openchoice/plugins`
+    /// `{data_dir}/app.openchoice.workbench/plugins`
     pub fn default_plugins_dir() -> Option<PathBuf> {
-        dirs::data_dir().map(|d: PathBuf| d.join("com.numerious.openchoice").join("plugins"))
+        dirs::data_dir().map(|d: PathBuf| d.join("app.openchoice.workbench").join("plugins"))
     }
 }
