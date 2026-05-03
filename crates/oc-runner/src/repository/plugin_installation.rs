@@ -1,4 +1,5 @@
 use rusqlite::params;
+use semver;
 
 use crate::db::Db;
 use crate::errors::RunnerError;
@@ -42,19 +43,25 @@ impl PluginInstallationRepository {
         Self { db }
     }
 
-    /// Returns the most recent non-quarantined installation for a plugin, if any.
+    /// Returns the highest-semver non-quarantined installation for a plugin, if any.
     pub fn get_current(&self, plugin_id: &str) -> Result<Option<PluginInstallationEntry>, RunnerError> {
         let conn = self.db.connect()?;
-        let result = conn.query_row(
-            &format!("{} WHERE plugin_id = ?1 AND quarantined_flag = 0 ORDER BY installed_at DESC LIMIT 1", SELECT_SQL),
-            params![plugin_id],
-            map_entry,
-        );
-        match result {
-            Ok(entry) => Ok(Some(entry)),
-            Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
-            Err(e) => Err(RunnerError::database(e.to_string())),
-        }
+        let mut stmt = conn
+            .prepare(&format!("{} WHERE plugin_id = ?1 AND quarantined_flag = 0", SELECT_SQL))
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![plugin_id], map_entry)
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let mut entries: Vec<PluginInstallationEntry> = rows
+            .filter_map(|r| r.ok())
+            .collect();
+        entries.sort_by(|a, b| {
+            match (semver::Version::parse(&a.version), semver::Version::parse(&b.version)) {
+                (Ok(va), Ok(vb)) => vb.cmp(&va),
+                _ => b.installed_at.cmp(&a.installed_at),
+            }
+        });
+        Ok(entries.into_iter().next())
     }
 
     pub fn insert(&self, entry: &PluginInstallationEntry) -> Result<(), RunnerError> {
@@ -115,21 +122,54 @@ impl PluginInstallationRepository {
         Ok(())
     }
 
-    /// Returns the most recent installation row for a plugin regardless of
+    /// Returns every non-quarantined installation row for a plugin, ordered by
+    /// `installed_at DESC` (most recent first). Used by the executor to build a
+    /// version-keyed dispatch map so tasks with `::version::` pins can route
+    /// to the right installation.
+    pub fn list_for_plugin(&self, plugin_id: &str) -> Result<Vec<PluginInstallationEntry>, RunnerError> {
+        let conn = self.db.connect()?;
+        let mut stmt = conn
+            .prepare(&format!(
+                "{} WHERE plugin_id = ?1 AND quarantined_flag = 0",
+                SELECT_SQL
+            ))
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![plugin_id], map_entry)
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let mut entries: Vec<PluginInstallationEntry> = rows
+            .filter_map(|r| r.ok())
+            .collect();
+        entries.sort_by(|a, b| {
+            match (semver::Version::parse(&a.version), semver::Version::parse(&b.version)) {
+                (Ok(va), Ok(vb)) => vb.cmp(&va),
+                _ => b.installed_at.cmp(&a.installed_at),
+            }
+        });
+        Ok(entries)
+    }
+
+    /// Returns the highest-semver installation row for a plugin regardless of
     /// quarantine state. Used by uninstall to find rows that `get_current`
     /// would skip.
     pub fn get_any(&self, plugin_id: &str) -> Result<Option<PluginInstallationEntry>, RunnerError> {
         let conn = self.db.connect()?;
-        let result = conn.query_row(
-            &format!("{} WHERE plugin_id = ?1 ORDER BY installed_at DESC LIMIT 1", SELECT_SQL),
-            params![plugin_id],
-            map_entry,
-        );
-        match result {
-            Ok(entry) => Ok(Some(entry)),
-            Err(rusqlite::Error::QueryReturnedNoRows) => Ok(None),
-            Err(e) => Err(RunnerError::database(e.to_string())),
-        }
+        let mut stmt = conn
+            .prepare(&format!("{} WHERE plugin_id = ?1", SELECT_SQL))
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let rows = stmt
+            .query_map(params![plugin_id], map_entry)
+            .map_err(|e| RunnerError::database(e.to_string()))?;
+        let mut entries: Vec<PluginInstallationEntry> = rows
+            .filter_map(|r| r.ok())
+            .collect();
+        entries.sort_by(|a, b| {
+            match (semver::Version::parse(&a.version), semver::Version::parse(&b.version)) {
+                (Ok(va), Ok(vb)) => vb.cmp(&va),
+                _ => b.installed_at.cmp(&a.installed_at),
+            }
+        });
+        Ok(entries.into_iter().next())
     }
 
     /// Hard-deletes every installation row for a plugin_id (including

@@ -8,6 +8,7 @@ description = "Shared .oce file execution engine used by Open Choice Tauri app a
 oc-core          = { version = "0.1", path = "../oc-core" }
 ocp-host         = { version = "0.1", path = "../ocp-host" }
 rusqlite         = { version = "0.31", features = ["bundled"] }
+semver           = { workspace = true }
 serde            = { workspace = true }
 serde_json       = { workspace = true }
 thiserror        = { workspace = true }

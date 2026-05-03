@@ -5,6 +5,8 @@ use std::collections::BTreeMap;
 use std::io::{BufRead, BufReader};
 use std::path::Path;
 use std::process::{Command, Stdio};
+#[cfg(target_os = "windows")]
+use std::os::windows::process::CommandExt;
 use std::sync::mpsc;
 use std::thread;
 use thiserror::Error;
@@ -81,6 +83,7 @@ pub fn run_tool_task<F, G>(
     mut on_stderr: G,
     timeout: Option<std::time::Duration>,
     working_dir: Option<&Path>,
+    resolved_deps_json: Option<&str>,
 ) -> Result<RunExecutionSummary, RunError>
 where
     F: FnMut(RunEvent) + Send + 'static,
@@ -88,7 +91,7 @@ where
 {
     let mut cmd = Command::new(executable_path);
     // Pass the task file path as an `OsStr` rather than going through `Display`
-    // (which substitutes � for non-UTF-8 path components and would silently
+    // (which substitutes â€¦ for non-UTF-8 path components and would silently
     // fail to open the file). `Command::arg` accepts `AsRef<OsStr>`, preserving
     // every byte of the original path.
     cmd.arg("run")
@@ -102,6 +105,13 @@ where
     if let Some(dir) = working_dir {
         cmd.current_dir(dir);
     }
+    // Inject resolved dependency paths so the plugin can call dependencies
+    // directly as subprocesses without knowing their install locations.
+    if let Some(deps_json) = resolved_deps_json {
+        cmd.env("OC_RESOLVED_DEPS", deps_json);
+    }
+    #[cfg(target_os = "windows")]
+    cmd.creation_flags(0x0800_0000); // CREATE_NO_WINDOW
     let mut child = cmd.spawn()
         .map_err(|err| RunError::Spawn(err.to_string()))?;
 

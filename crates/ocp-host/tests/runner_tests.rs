@@ -37,6 +37,7 @@ fn nonexistent_exe_returns_spawn_error() {
         |_| {},
         None,
         None,
+        None,
     );
     assert!(
         matches!(result, Err(RunError::Spawn(_))),
@@ -60,6 +61,7 @@ fn successful_run_collects_finished_event() {
         |_| {},
         None,
         None,
+        None,
     )
     .expect("run should succeed");
 
@@ -76,7 +78,7 @@ fn successful_run_collects_finished_event() {
 #[test]
 fn nonzero_exit_code_reported_in_summary() {
     let task = dummy_task_file();
-    let summary = run_tool_task(&helper(), task.path(), "error", |_| {}, |_| {}, None, None)
+    let summary = run_tool_task(&helper(), task.path(), "error", |_| {}, |_| {}, None, None, None)
         .expect("run should not hard-error for non-zero exit");
     assert_ne!(summary.exit_code, 0);
 }
@@ -96,6 +98,7 @@ fn non_envelope_line_synthesized_as_log_event() {
             received_clone.lock().unwrap().push(event.kind().to_string());
         },
         |_| {},
+        None,
         None,
         None,
     )
@@ -121,6 +124,7 @@ fn hung_process_killed_after_timeout() {
         |_| {},
         Some(std::time::Duration::from_millis(300)),
         None,
+        None,
     );
     assert!(
         matches!(result, Err(RunError::Timeout(_))),
@@ -138,6 +142,7 @@ fn timeout_error_reports_correct_seconds() {
         |_| {},
         |_| {},
         Some(std::time::Duration::from_secs(1)),
+        None,
         None,
     );
     assert!(
@@ -158,6 +163,7 @@ fn fast_process_completes_before_generous_timeout() {
         |_| {},
         |_| {},
         Some(std::time::Duration::from_secs(30)),
+        None,
         None,
     );
     assert!(result.is_ok(), "should complete without timing out");

@@ -18,6 +18,9 @@ pub struct PluginRegistryEntry {
     pub enabled_flag: bool,
     pub installed_at: String,
     pub updated_at: String,
+    /// JSON-serialised `Vec<PluginDependency>`. NULL for plugins installed
+    /// before dependency support was added.
+    pub dependencies_json: Option<String>,
 }
 
 pub struct PluginRegistryRepository {
@@ -61,8 +64,9 @@ impl PluginRegistryRepository {
             "INSERT INTO plugin_registry (
                 plugin_id, display_name, current_version, publisher, description,
                 runtime_type, protocol_family, protocol_version,
-                trust_status, risk_profile, enabled_flag, installed_at, updated_at
-             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13)
+                trust_status, risk_profile, enabled_flag, installed_at, updated_at,
+                dependencies_json
+             ) VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14)
              ON CONFLICT(plugin_id) DO UPDATE SET
                 display_name = excluded.display_name,
                 current_version = excluded.current_version,
@@ -74,7 +78,8 @@ impl PluginRegistryRepository {
                 trust_status = excluded.trust_status,
                 risk_profile = excluded.risk_profile,
                 enabled_flag = excluded.enabled_flag,
-                updated_at = excluded.updated_at",
+                updated_at = excluded.updated_at,
+                dependencies_json = excluded.dependencies_json",
             params![
                 &entry.plugin_id,
                 &entry.display_name,
@@ -89,6 +94,7 @@ impl PluginRegistryRepository {
                 if entry.enabled_flag { 1i64 } else { 0i64 },
                 &entry.installed_at,
                 &entry.updated_at,
+                &entry.dependencies_json,
             ],
         )
         .map_err(|e| RunnerError::database(e.to_string()))?;
@@ -109,7 +115,8 @@ impl PluginRegistryRepository {
 const SELECT_SQL: &str = "SELECT
     plugin_id, display_name, current_version, publisher, description,
     runtime_type, protocol_family, protocol_version,
-    trust_status, risk_profile, enabled_flag, installed_at, updated_at
+    trust_status, risk_profile, enabled_flag, installed_at, updated_at,
+    dependencies_json
   FROM plugin_registry";
 
 fn map_entry(row: &rusqlite::Row<'_>) -> rusqlite::Result<PluginRegistryEntry> {
@@ -127,5 +134,6 @@ fn map_entry(row: &rusqlite::Row<'_>) -> rusqlite::Result<PluginRegistryEntry> {
         enabled_flag: row.get::<_, i64>(10)? != 0,
         installed_at: row.get(11)?,
         updated_at: row.get(12)?,
+        dependencies_json: row.get(13)?,
     })
 }

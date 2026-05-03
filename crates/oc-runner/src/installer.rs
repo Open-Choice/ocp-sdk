@@ -41,6 +41,21 @@ pub struct PluginManifest {
     pub snippets: Option<Vec<ManifestSnippet>>,
     #[serde(default)]
     pub commands: Vec<String>,
+    #[serde(default)]
+    pub dependencies: Vec<PluginDependency>,
+}
+
+/// **Keep in sync** with `PluginDependency` in `executor.rs` and the Tauri
+/// app's `plugin_install_service.rs`. All three are serialised to/deserialised
+/// from the same `dependencies_json` column — a field added to one must be
+/// added to all.
+#[derive(Debug, Deserialize, Clone, serde::Serialize)]
+pub struct PluginDependency {
+    pub plugin_id: String,
+    pub version_range: String,
+    #[serde(default)]
+    pub optional: bool,
+    pub reason: Option<String>,
 }
 
 #[derive(Debug, Deserialize)]
@@ -291,6 +306,12 @@ impl PluginInstallService {
         // 12. Persist to database.
         let risk_profile = risk_profile_str.to_string();
 
+        let dependencies_json = if manifest.dependencies.is_empty() {
+            None
+        } else {
+            serde_json::to_string(&manifest.dependencies).ok()
+        };
+
         self.registry_repo.upsert(&PluginRegistryEntry {
             plugin_id: manifest.plugin_id.clone(),
             display_name: manifest.display_name.clone(),
@@ -305,6 +326,7 @@ impl PluginInstallService {
             enabled_flag: true,
             installed_at: now.clone(),
             updated_at: now.clone(),
+            dependencies_json,
         })?;
 
         // Defensively clear any pre-existing row with the same installation_id

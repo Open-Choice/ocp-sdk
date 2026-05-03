@@ -95,13 +95,35 @@ pub fn parse_str(
             }
         };
 
+        // Disambiguation suffixes so two blocks differing only in pinned
+        // version or `|label` don't collide on task_id (each plugin looks up
+        // its params by id from the shared task-file JSON). Suffixes are
+        // sanitized to satisfy the wire-format-1 task_id grammar:
+        // `^[A-Za-z0-9][A-Za-z0-9_.\-]{0,255}$`.
+        let sanitize = |s: &str| -> String {
+            s.chars()
+                .map(|c| if c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '.' { c } else { '_' })
+                .collect()
+        };
+        let version_suffix = pinned_version
+            .map(|v| format!("_v{}", sanitize(&v.replace('.', "_"))))
+            .unwrap_or_default();
+        let label_suffix = task_label
+            .as_deref()
+            .map(|l| format!("_{}", sanitize(l)))
+            .unwrap_or_default();
+
         for (index, item) in items.iter().enumerate() {
             let params = serde_json::to_value(item).unwrap_or(Value::Null);
-            let task_id = if items.len() == 1 {
-                format!("{}_{}", alias_name, endpoint)
+            let index_suffix = if items.len() > 1 {
+                format!("_{}", index + 1)
             } else {
-                format!("{}_{}_{}", alias_name, endpoint, index + 1)
+                String::new()
             };
+            let task_id = format!(
+                "{}_{}{}{}{}",
+                alias_name, endpoint, version_suffix, label_suffix, index_suffix
+            );
             tasks.push(OcTask {
                 id: task_id,
                 plugin_id: entry.plugin_id.clone(),
@@ -538,13 +560,17 @@ operands = [1.0]
     }
 
     #[test]
-    fn label_does_not_affect_task_id_or_command() {
+    fn label_folds_into_task_id_sanitized() {
+        // Label disambiguates the task_id so multi-block runs don't collide
+        // on task lookup. Non-grammar chars (spaces) are mapped to `_` to
+        // satisfy the wire-format-1 task_id regex.
         let input = r#"[["calc::add|my run"]]
 operands = [1.0]
 "#;
         let t = &parse_str(input, &calc(), PathBuf::from("t.oce")).unwrap().tasks[0];
-        assert_eq!(t.id, "calc_add");
+        assert_eq!(t.id, "calc_add_my_run");
         assert_eq!(t.command, "add");
+        assert_eq!(t.label.as_deref(), Some("my run"));
     }
 
     #[test]
@@ -594,11 +620,10 @@ code = "print(1)"
     }
 
     #[test]
-    fn different_labels_same_base_endpoint_both_produce_same_task_id() {
-        // Two blocks with different |label suffixes are different TOML keys.
-        // Each key has items.len() == 1, so both get the same base id `calc_add`.
-        // This is intentional — the JS CodeLens layer handles disambiguation
-        // via inlineContent when multiple blocks share the same base task id.
+    fn different_labels_produce_distinct_task_ids() {
+        // Two blocks differing only in |label are different TOML keys, and
+        // must yield distinct task_ids so each plugin invocation looks up
+        // the correct params from the shared task-file JSON.
         let input = r#"
 [["calc::add|x"]]
 operands = [1.0]
@@ -608,10 +633,9 @@ operands = [2.0]
 "#;
         let file = parse_str(input, &calc(), PathBuf::from("t.oce")).unwrap();
         assert_eq!(file.tasks.len(), 2);
-        assert!(file.tasks.iter().all(|t| t.id == "calc_add"));
-        let labels: Vec<Option<&str>> = file.tasks.iter().map(|t| t.label.as_deref()).collect();
-        assert!(labels.contains(&Some("x")));
-        assert!(labels.contains(&Some("y")));
+        let ids: Vec<&str> = file.tasks.iter().map(|t| t.id.as_str()).collect();
+        assert!(ids.contains(&"calc_add_x"));
+        assert!(ids.contains(&"calc_add_y"));
     }
 
     #[test]
@@ -622,7 +646,9 @@ operands = [1.0]
         let t = &parse_str(input, &calc(), PathBuf::from("t.oce")).unwrap().tasks[0];
         assert_eq!(t.version.as_deref(), Some("1.5.0"));
         assert_eq!(t.label.as_deref(), Some("pinned run"));
-        assert_eq!(t.id, "calc_add");
+        // Pinned version and label both fold into the task_id (spaces
+        // sanitized to `_`) so version-differing blocks never collide.
+        assert_eq!(t.id, "calc_add_v1_5_0_pinned_run");
         assert_eq!(t.command, "add");
     }
 
